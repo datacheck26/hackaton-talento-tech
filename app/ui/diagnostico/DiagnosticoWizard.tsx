@@ -11,7 +11,6 @@ import { BLOQUES } from '../../../lib/diagnostico/preguntas';
 import ProgressBar from './ProgressBar';
 import GaugeChart from './GaugeChart';
 import PreguntaCard from './PreguntaCard';
-import CopilotSidebar from './CopilotSidebar';
 import SkipNotice from './SkipNotice';
 import ResultadoPanel from './ResultadoPanel';
 
@@ -49,12 +48,7 @@ export default function DiagnosticoWizard() {
         <SkipNotice onClose={cerrarSkipNotice} />
       )}
 
-      {/* ── COPILOT SIDEBAR ───────────────────────────────────── */}
-      <CopilotSidebar
-        abierto={estado.copilotAbierto}
-        pregunta={estado.preguntaCopilot}
-        onCerrar={cerrarCopilot}
-      />
+
 
       {/* ── LAYOUT PRINCIPAL ──────────────────────────────────── */}
       <div className="min-h-full bg-[#F8FAFC] text-[#0F172A] font-sans">
