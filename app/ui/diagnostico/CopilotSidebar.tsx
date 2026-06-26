@@ -1,11 +1,17 @@
 'use client';
 
 // ============================================================
-// CopilotSidebar — Modo Claro (paleta CAVALTEC)
+// CopilotSidebar — Modo Claro (paleta CAVALTEC) con Chat Activo
 // ============================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Pregunta } from '../../../lib/diagnostico/types';
+import { useEmpresa } from '../../../lib/empresa/useEmpresa';
+
+interface Message {
+  sender: 'user' | 'assistant';
+  text: string;
+}
 
 interface CopilotSidebarProps {
   abierto: boolean;
@@ -13,22 +19,98 @@ interface CopilotSidebarProps {
   onCerrar: () => void;
 }
 
+function renderMarkdown(text: string) {
+  // Simple conversion of bold and newlines for styling the AI chat reply
+  const formatted = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^\* (.*?)$/gm, '• $1')
+    .split('\n')
+    .join('<br />');
+  return <div dangerouslySetInnerHTML={{ __html: formatted }} />;
+}
+
 export default function CopilotSidebar({ abierto, pregunta, onCerrar }: CopilotSidebarProps) {
+  const { empresa } = useEmpresa();
   const [cargando, setCargando] = useState(false);
   const [mostrarContenido, setMostrarContenido] = useState(false);
+  
+  // Chat state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputVal, setInputVal] = useState('');
+  const [enviando, setEnviando] = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (messages.length > 0 || enviando) {
+      scrollToBottom();
+    }
+  }, [messages, enviando]);
 
   useEffect(() => {
     if (abierto && pregunta) {
       setCargando(true);
       setMostrarContenido(false);
+      setMessages([]);
+      setInputVal('');
+      setEnviando(false);
+      
       const timer = setTimeout(() => {
         setCargando(false);
         setMostrarContenido(true);
       }, 1400);
+      
       return () => clearTimeout(timer);
     }
     return undefined;
   }, [abierto, pregunta?.id]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputVal.trim() || enviando || !pregunta) return;
+
+    const userMsg = inputVal.trim();
+    setInputVal('');
+    setMessages((prev) => [...prev, { sender: 'user', text: userMsg }]);
+    setEnviando(true);
+
+    try {
+      const res = await fetch('/api/copilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pregunta: {
+            id: pregunta.id,
+            texto: pregunta.texto,
+            articuloLegal: pregunta.articuloLegal,
+            textoLegal: pregunta.textoLegal,
+          },
+          mensajeUsuario: userMsg,
+          empresa: empresa ? {
+            nombre: empresa.nombre,
+            sector: empresa.sector,
+            tamano: empresa.tamano
+          } : null,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Error al conectar con la IA');
+
+      const data = await res.json();
+      setMessages((prev) => [...prev, { sender: 'assistant', text: data.respuesta }]);
+    } catch (err: any) {
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'assistant', text: '❌ Lo siento, no logré procesar tu solicitud. Por favor intenta de nuevo.' }
+      ]);
+    } finally {
+      setEnviando(false);
+    }
+  };
 
   return (
     <>
@@ -164,17 +246,99 @@ export default function CopilotSidebar({ abierto, pregunta, onCerrar }: CopilotS
                   para asesoría legal vinculante.
                 </p>
               </div>
+
+              {/* ── SECCIÓN CHAT INTERACTIVO ───────────────────── */}
+              <div className="border-t border-[#E2E8F0] my-6 pt-6 space-y-4">
+                <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+                  <span className="text-sm">💬</span> Chat Interactivo Copilot
+                </h3>
+
+                {/* Historial de mensajes */}
+                <div className="space-y-4">
+                  {messages.length === 0 ? (
+                    <p className="text-xs text-[#64748B] italic bg-white border border-[#E2E8F0] rounded-xl p-4 text-center shadow-sm">
+                      ¿Tienes dudas sobre esta pregunta o sobre cómo implementarla en tu empresa? Escríbela abajo y te responderé en tiempo real.
+                    </p>
+                  ) : (
+                    messages.map((msg, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex gap-2.5 max-w-[85%] ${
+                          msg.sender === 'user' ? 'ml-auto flex-row-reverse' : ''
+                        }`}
+                      >
+                        {msg.sender === 'assistant' && (
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#041C4A] to-[#0A2E73] flex items-center justify-center text-white text-[10px] flex-shrink-0">
+                            🤖
+                          </div>
+                        )}
+                        <div
+                          className={`rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${
+                            msg.sender === 'user'
+                              ? 'bg-[#2563EB] text-white rounded-tr-none'
+                              : 'bg-white border border-[#E2E8F0] text-[#0F172A] rounded-tl-none shadow-sm'
+                          }`}
+                        >
+                          {msg.sender === 'assistant' ? (
+                            renderMarkdown(msg.text)
+                          ) : (
+                            <p>{msg.text}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+
+                  {enviando && (
+                    <div className="flex gap-2.5 max-w-[85%]">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#041C4A] to-[#0A2E73] flex items-center justify-center text-white text-[10px] flex-shrink-0">
+                        🤖
+                      </div>
+                      <div className="bg-white border border-[#E2E8F0] rounded-2xl rounded-tl-none px-3.5 py-3 text-xs shadow-sm flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#64748B] animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#64748B] animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#64748B] animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* Ref for auto scrolling */}
+                <div ref={messagesEndRef} />
+              </div>
+
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-3 border-t border-[#E2E8F0] bg-white">
-          <p className="text-[10px] text-[#64748B] text-center">
-            Powered by Datacheck AI · Ley 1581 de 2012 · Colombia
-          </p>
+        {/* Footer con Formulario del Chat */}
+        <div className="px-4 py-3.5 border-t border-[#E2E8F0] bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+          {pregunta && mostrarContenido && !cargando ? (
+            <form onSubmit={handleSendMessage} className="flex gap-2">
+              <input
+                type="text"
+                value={inputVal}
+                onChange={(e) => setInputVal(e.target.value)}
+                placeholder="Pregunta a la IA sobre este requisito..."
+                className="input-base flex-1 px-3.5 py-2.5 text-xs text-[#0F172A] border-[#E2E8F0]"
+                disabled={enviando}
+              />
+              <button
+                type="submit"
+                disabled={!inputVal.trim() || enviando}
+                className="btn-primary px-4 py-2.5 text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>Enviar</span>
+                <span>➔</span>
+              </button>
+            </form>
+          ) : (
+            <p className="text-[10px] text-[#64748B] text-center">
+              Powered by Datacheck AI · Ley 1581 de 2012 · Colombia
+            </p>
+          )}
         </div>
       </aside>
     </>
   );
 }
+
