@@ -83,9 +83,9 @@ export default function GaugeChart({ score, nivelRiesgo, animated = true }: Gaug
       {/* SVG Gauge */}
       <div className="relative">
         <svg
-          viewBox="0 0 200 140"
+          viewBox="0 0 200 195"
           width="220"
-          height="154"
+          height="214"
           className="overflow-visible"
           role="img"
           aria-label={`Gauge de cumplimiento: ${clampedScore}%`}
