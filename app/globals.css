@@ -1,35 +1,56 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Datacheck AI — Design System & Animations
-   Dark Mode · Emerald/Teal/Cyan Accent Palette
+   Datacheck AI — Design System
+   Light Mode · Paleta CAVALTEC
    ============================================================ */
 
 /* ── CSS Custom Properties ────────────────────────────────── */
 :root {
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 
-  /* Core palette */
-  --color-bg-base:        #020617;  /* slate-950 */
-  --color-bg-surface:     #0f172a;  /* slate-900 */
-  --color-bg-elevated:    #1e293b;  /* slate-800 */
-  --color-border:         rgba(148, 163, 184, 0.12);
-  --color-border-accent:  rgba(16, 185, 129, 0.25);
+  /* Core palette — Light Mode */
+  --color-bg-base:         #F8FAFC;
+  --color-bg-surface:      #FFFFFF;
+  --color-bg-muted:        #F1F5F9;
+  --color-border:          #E2E8F0;
+  --color-border-focus:    #2563EB;
 
-  /* Accent colors */
-  --color-emerald:        #10b981;
-  --color-teal:           #14b8a6;
-  --color-cyan:           #06b6d4;
+  /* Sidebar */
+  --color-sidebar-from:    #041C4A;
+  --color-sidebar-to:      #0A2E73;
 
-  /* Risk colors */
-  --color-risk-critico:   #ef4444;
-  --color-risk-proceso:   #f59e0b;
-  --color-risk-conforme:  #10b981;
+  /* Brand / Acción */
+  --color-primary:         #2563EB;
+  --color-primary-hover:   #1D4ED8;
+  --color-primary-light:   #EFF6FF;
+  --color-ia:              #3B82F6;
 
-  /* Transition */
-  --transition-fast:      150ms ease;
-  --transition-base:      250ms ease;
-  --transition-slow:      500ms ease;
+  /* Texto */
+  --color-text-primary:    #0F172A;
+  --color-text-secondary:  #64748B;
+  --color-text-muted:      #94A3B8;
+  --color-text-inverse:    #FFFFFF;
+
+  /* Riesgo — Conforme */
+  --color-conforme:        #16A34A;
+  --color-conforme-bg:     #DCFCE7;
+  --color-conforme-border: #BBF7D0;
+
+  /* Riesgo — En Proceso */
+  --color-proceso:         #F59E0B;
+  --color-proceso-bg:      #FEF3C7;
+  --color-proceso-border:  #FDE68A;
+
+  /* Riesgo — Crítico */
+  --color-critico:         #EF4444;
+  --color-critico-bg:      #FEE2E2;
+  --color-critico-border:  #FECACA;
+
+  /* Transitions */
+  --transition-fast:       150ms ease;
+  --transition-base:       250ms ease;
+  --transition-slow:       500ms ease;
 }
 
 /* ── Global Reset & Base ──────────────────────────────────── */
@@ -45,7 +66,7 @@ html {
 
 body {
   background-color: var(--color-bg-base);
-  color: #f1f5f9;
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -57,27 +78,27 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--color-bg-muted);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #CBD5E1;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94A3B8;
 }
 
 /* ── Selection ────────────────────────────────────────────── */
 ::selection {
-  background: rgba(16, 185, 129, 0.25);
-  color: #d1fae5;
+  background: #BFDBFE;
+  color: #1E3A8A;
 }
 
 /* ============================================================
    KEYFRAME ANIMATIONS
    ============================================================ */
 
-/* Fade + slide up (entry animation for cards, notices) */
+/* Fade + slide up */
 @keyframes fade-slide-up {
   from {
     opacity: 0;
@@ -89,7 +110,19 @@ body {
   }
 }
 
-/* Shimmer sweep (for progress bar and skeleton) */
+/* Fade + slide in from right */
+@keyframes fade-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Shimmer sweep (progress bar / skeleton) */
 @keyframes shimmer {
   0% {
     background-position: 200% center;
@@ -99,17 +132,17 @@ body {
   }
 }
 
-/* Pulse glow (for live indicators) */
-@keyframes glow-pulse {
+/* Pulse glow azul (live indicators) */
+@keyframes glow-pulse-blue {
   0%, 100% {
-    box-shadow: 0 0 4px 1px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 4px 1px rgba(37, 99, 235, 0.25);
   }
   50% {
-    box-shadow: 0 0 12px 3px rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 12px 3px rgba(37, 99, 235, 0.5);
   }
 }
 
-/* Shrink width (for skip notice countdown bar) */
+/* Shrink width (countdown bar) */
 @keyframes shrink-width {
   from { width: 100%; }
   to   { width: 0%; }
@@ -121,16 +154,28 @@ body {
   50%       { opacity: 0.7; }
 }
 
-/* Rotate (loading spinner) */
+/* Spin */
 @keyframes spin-smooth {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
 
-/* Float (decorative elements) */
+/* Float */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-6px); }
+}
+
+/* Scale in (modal, cards) */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ============================================================
@@ -141,20 +186,28 @@ body {
   animation: fade-slide-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.animate-fade-slide-right {
+  animation: fade-slide-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .animate-shimmer {
   background-size: 200% 100%;
   animation: shimmer 2.5s infinite linear;
 }
 
-.animate-glow-pulse {
-  animation: glow-pulse 2s infinite ease-in-out;
+.animate-glow-pulse-blue {
+  animation: glow-pulse-blue 2s infinite ease-in-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Staggered children delay utility */
+/* Staggered children */
 .animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
 .animate-stagger > *:nth-child(2) { animation-delay: 60ms; }
 .animate-stagger > *:nth-child(3) { animation-delay: 120ms; }
@@ -165,21 +218,83 @@ body {
    COMPONENT-LEVEL STYLES
    ============================================================ */
 
-/* Glassmorphism surface */
-.glass-surface {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+/* Sidebar gradient */
+.sidebar-gradient {
+  background: linear-gradient(180deg, var(--color-sidebar-from) 0%, var(--color-sidebar-to) 100%);
 }
 
-/* Button focus ring override */
+/* Card base */
+.card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+/* Input base */
+.input-base {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.input-base::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Button primary */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Button focus ring */
 button:focus-visible {
-  outline: 2px solid var(--color-emerald);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Print styles for result export */
+/* Risk badge */
+.badge-conforme {
+  background: var(--color-conforme-bg);
+  color: var(--color-conforme);
+  border: 1px solid var(--color-conforme-border);
+}
+
+.badge-proceso {
+  background: var(--color-proceso-bg);
+  color: var(--color-proceso);
+  border: 1px solid var(--color-proceso-border);
+}
+
+.badge-critico {
+  background: var(--color-critico-bg);
+  color: var(--color-critico);
+  border: 1px solid var(--color-critico-border);
+}
+
+/* Print styles */
 @media print {
   body {
     background: white !important;

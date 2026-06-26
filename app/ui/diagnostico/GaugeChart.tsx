@@ -13,24 +13,27 @@ interface GaugeChartProps {
   animated?: boolean;
 }
 
-const NIVEL_CONFIG: Record<NivelRiesgo, { color: string; label: string; emoji: string; glow: string }> = {
+const NIVEL_CONFIG: Record<NivelRiesgo, { color: string; label: string; emoji: string; glow: string; badgeBg: string }> = {
   critico: {
-    color: '#ef4444',
+    color: '#EF4444',
     label: 'Incumplimiento Crítico',
     emoji: '🔴',
-    glow: 'rgba(239,68,68,0.4)',
+    glow: 'rgba(239,68,68,0.25)',
+    badgeBg: '#FEE2E2',
   },
   en_proceso: {
-    color: '#f59e0b',
+    color: '#F59E0B',
     label: 'En Proceso',
     emoji: '🟡',
-    glow: 'rgba(245,158,11,0.4)',
+    glow: 'rgba(245,158,11,0.25)',
+    badgeBg: '#FEF3C7',
   },
   conforme: {
-    color: '#10b981',
+    color: '#16A34A',
     label: 'Conforme',
     emoji: '🟢',
-    glow: 'rgba(16,185,129,0.4)',
+    glow: 'rgba(22,163,74,0.25)',
+    badgeBg: '#DCFCE7',
   },
 };
 
@@ -140,7 +143,7 @@ export default function GaugeChart({ score, nivelRiesgo, animated = true }: Gaug
                   y1={innerPt.y}
                   x2={outerPt.x}
                   y2={outerPt.y}
-                  stroke="#475569"
+                  stroke="#CBD5E1"
                   strokeWidth="1.5"
                 />
                 <text
@@ -168,7 +171,7 @@ export default function GaugeChart({ score, nivelRiesgo, animated = true }: Gaug
           />
 
           {/* Center hub */}
-          <circle cx={CX} cy={CY} r="8" fill="#1e293b" stroke={config.color} strokeWidth="2" />
+          <circle cx={CX} cy={CY} r="8" fill="white" stroke={config.color} strokeWidth="2" />
           <circle cx={CX} cy={CY} r="3" fill={config.color} />
 
           {/* Score display */}
@@ -189,12 +192,11 @@ export default function GaugeChart({ score, nivelRiesgo, animated = true }: Gaug
 
       {/* Status badge */}
       <div
-        className="flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold transition-all duration-500"
+        className="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold transition-all duration-500"
         style={{
           borderColor: config.color,
           color: config.color,
-          background: `${config.glow}`,
-          boxShadow: `0 0 12px ${config.glow}`,
+          background: config.badgeBg,
         }}
       >
         <span>{config.emoji}</span>

@@ -1,11 +1,12 @@
 'use client';
 
 // ============================================================
-// DiagnosticoWizard — Componente Orquestador Principal
-// Layout: Split-screen | Wizard conversacional | Dark Mode
+// DiagnosticoWizard — Modo Claro (paleta CAVALTEC)
 // ============================================================
 
+import { useRouter } from 'next/navigation';
 import { useDiagnostico } from '../../../lib/diagnostico/useDiagnostico';
+import { useEmpresa } from '../../../lib/empresa/useEmpresa';
 import { BLOQUES } from '../../../lib/diagnostico/preguntas';
 import ProgressBar from './ProgressBar';
 import GaugeChart from './GaugeChart';
@@ -15,6 +16,8 @@ import SkipNotice from './SkipNotice';
 import ResultadoPanel from './ResultadoPanel';
 
 export default function DiagnosticoWizard() {
+  const router = useRouter();
+  const { guardarDiagnostico, empresa } = useEmpresa();
   const {
     estado,
     preguntaActual,
@@ -31,6 +34,14 @@ export default function DiagnosticoWizard() {
     ? BLOQUES.find((b) => b.id === preguntaActual.bloqueId)
     : null;
 
+  // Guardar resultado en historial cuando se completa
+  const handleResultadoGuardado = (callback: () => void) => {
+    if (estado.resultado) {
+      guardarDiagnostico(estado.resultado);
+    }
+    callback();
+  };
+
   return (
     <>
       {/* ── SKIP NOTICE MODAL ─────────────────────────────────── */}
@@ -46,41 +57,27 @@ export default function DiagnosticoWizard() {
       />
 
       {/* ── LAYOUT PRINCIPAL ──────────────────────────────────── */}
-      <div className="min-h-screen bg-slate-950 text-white font-sans">
-        {/* Background grid pattern */}
-        <div
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 1px 1px, rgba(148,163,184,0.04) 1px, transparent 0)',
-            backgroundSize: '32px 32px',
-          }}
-        />
-
-        {/* Background gradient blob */}
-        <div
-          className="fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full pointer-events-none blur-3xl opacity-20"
-          style={{
-            background: 'radial-gradient(ellipse, #10b98120 0%, #06b6d420 40%, transparent 70%)',
-          }}
-        />
+      <div className="min-h-full bg-[#F8FAFC] text-[#0F172A] font-sans">
 
         {/* ── HEADER ──────────────────────────────────────────── */}
-        <header className="relative z-10 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-xl sticky top-0">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+        <header className="bg-white border-b border-[#E2E8F0] sticky top-0 z-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3">
             <div className="flex items-center justify-between gap-4">
-              {/* Logo */}
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                  <span className="text-white text-sm font-black">D</span>
+              {/* Empresa + Breadcrumb */}
+              <div className="flex items-center gap-2 min-w-0">
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="text-[#64748B] hover:text-[#0F172A] transition-colors text-sm"
+                >
+                  ←
+                </button>
+                <span className="text-[#E2E8F0]">|</span>
+                <div className="min-w-0">
+                  <p className="text-xs text-[#64748B] font-mono">Diagnóstico activo</p>
+                  <p className="text-sm font-bold text-[#0F172A] truncate">
+                    {empresa?.nombre ?? 'Mi Organización'}
+                  </p>
                 </div>
-                <div>
-                  <span className="text-sm font-black text-white tracking-tight">Datacheck</span>
-                  <span className="text-sm font-black text-emerald-400 tracking-tight"> AI</span>
-                </div>
-                <span className="hidden sm:block text-[10px] font-mono text-slate-500 border border-slate-700/50 rounded px-1.5 py-0.5">
-                  Ley 1581/2012
-                </span>
               </div>
 
               {/* Progress bar (centro) */}
@@ -94,18 +91,18 @@ export default function DiagnosticoWizard() {
                 </div>
               )}
 
-              {/* Score mini (derecha) */}
-              <div className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700/50">
-                <span className="text-xs text-slate-400">Score:</span>
+              {/* Score mini */}
+              <div className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                <span className="text-xs text-[#64748B]">Score:</span>
                 <span
                   className="text-sm font-black"
                   style={{
                     color:
                       estado.nivelRiesgo === 'critico'
-                        ? '#ef4444'
+                        ? '#EF4444'
                         : estado.nivelRiesgo === 'en_proceso'
-                        ? '#f59e0b'
-                        : '#10b981',
+                        ? '#F59E0B'
+                        : '#16A34A',
                   }}
                 >
                   {estado.scoreActual}%
@@ -113,7 +110,7 @@ export default function DiagnosticoWizard() {
               </div>
             </div>
 
-            {/* Mobile progress bar */}
+            {/* Mobile progress */}
             {!estado.completado && (
               <div className="mt-2 md:hidden">
                 <ProgressBar
@@ -126,37 +123,41 @@ export default function DiagnosticoWizard() {
           </div>
         </header>
 
-        {/* ── MAIN CONTENT ────────────────────────────────────── */}
-        <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {/* ── MAIN ────────────────────────────────────────────── */}
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
           {estado.completado && estado.resultado ? (
-            /* ── RESULTADO FINAL ──────────────────────────── */
-            <ResultadoPanel resultado={estado.resultado} onReiniciar={reiniciar} />
+            <ResultadoPanel
+              resultado={estado.resultado}
+              onReiniciar={() => handleResultadoGuardado(reiniciar)}
+              onVerDashboard={() => {
+                if (estado.resultado) guardarDiagnostico(estado.resultado);
+                router.push('/dashboard');
+              }}
+            />
           ) : (
-            /* ── WIZARD SPLIT-SCREEN ──────────────────────── */
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
-              {/* ── COLUMNA IZQUIERDA: Pregunta + Sidebar de Bloques ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 items-start">
+
+              {/* ── Columna izquierda ── */}
               <div className="space-y-5">
-                {/* Mobile progress */}
-                <div className="lg:hidden" />
 
                 {/* Bloque actual pill */}
                 {bloqueActual && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{bloqueActual.icono}</span>
+                  <div className="flex items-center gap-3 animate-fade-slide-up">
+                    <span className="text-xl">{bloqueActual.icono}</span>
                     <div>
-                      <p className="text-xs text-slate-500 uppercase tracking-widest">Bloque actual</p>
-                      <p className="text-sm font-bold text-white">{bloqueActual.titulo}</p>
+                      <p className="text-xs text-[#64748B] uppercase tracking-widest">Bloque actual</p>
+                      <p className="text-sm font-bold text-[#0F172A]">{bloqueActual.titulo}</p>
                     </div>
-                    <div className="ml-auto text-xs text-slate-500 font-mono">
-                      Máx {bloqueActual.pesoMaximo}% del score
+                    <div className="ml-auto text-xs text-[#64748B] font-mono bg-[#F1F5F9] px-2 py-1 rounded-lg">
+                      Máx {bloqueActual.pesoMaximo}%
                     </div>
                   </div>
                 )}
 
-                {/* Tarjeta de pregunta */}
+                {/* Tarjeta pregunta */}
                 {preguntaActual && bloqueActual ? (
                   <PreguntaCard
-                    key={preguntaActual.id} // key fuerza re-mount para animación
+                    key={preguntaActual.id}
                     pregunta={preguntaActual}
                     bloque={bloqueActual}
                     numeroPregunta={estado.preguntaActualIndex + 1}
@@ -166,24 +167,20 @@ export default function DiagnosticoWizard() {
                     onConsultarCopilot={abrirCopilot}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-64 rounded-2xl bg-slate-800/40 border border-slate-700/40">
-                    <p className="text-slate-500">Cargando siguiente pregunta...</p>
+                  <div className="flex items-center justify-center h-48 rounded-2xl bg-white border border-[#E2E8F0]">
+                    <p className="text-[#64748B]">Cargando...</p>
                   </div>
                 )}
 
-                {/* Bloques completados (navegación visual) */}
+                {/* Progreso por bloques */}
                 <div className="grid grid-cols-3 gap-3">
                   {BLOQUES.map((bloque) => {
-                    const preguntasDelBloque = Array.from({ length: 11 })
-                      .map((_, i) => `Q${i + 1}`)
-                      .filter((id) => {
-                        const p = id;
-                        // Map IDs to bloques
-                        if (bloque.id === 'politica') return ['Q1','Q2','Q3','Q4','Q5'].includes(p);
-                        if (bloque.id === 'privacidad_disenio') return ['Q6','Q7','Q8'].includes(p);
-                        return ['Q9','Q10','Q11'].includes(p);
-                      });
-                    const respondidas = preguntasDelBloque.filter((id) => estado.respuestas[id]).length;
+                    const ids = bloque.id === 'politica'
+                      ? ['Q1','Q2','Q3','Q4','Q5']
+                      : bloque.id === 'privacidad_disenio'
+                      ? ['Q6','Q7','Q8']
+                      : ['Q9','Q10','Q11'];
+                    const respondidas = ids.filter((id) => estado.respuestas[id]).length;
                     const esActivo = bloqueActual?.id === bloque.id;
 
                     return (
@@ -191,29 +188,29 @@ export default function DiagnosticoWizard() {
                         key={bloque.id}
                         className={`rounded-xl p-3 border transition-all duration-300 ${
                           esActivo
-                            ? 'border-emerald-500/40 bg-emerald-500/10'
+                            ? 'border-[#2563EB] bg-[#EFF6FF]'
                             : respondidas > 0
-                            ? 'border-slate-600/50 bg-slate-800/40'
-                            : 'border-slate-700/30 bg-slate-800/20'
+                            ? 'border-[#E2E8F0] bg-white'
+                            : 'border-[#E2E8F0] bg-[#F8FAFC]'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-sm">{bloque.icono}</span>
-                          <span className="text-[10px] font-mono text-slate-500">
-                            {respondidas}/{preguntasDelBloque.length}
+                          <span className="text-[10px] font-mono text-[#64748B]">
+                            {respondidas}/{ids.length}
                           </span>
                         </div>
-                        <p className="text-[10px] font-semibold text-slate-400 leading-tight">
+                        <p className="text-[10px] font-semibold text-[#0F172A] leading-tight">
                           {bloque.titulo}
                         </p>
-                        <div className="mt-2 h-1 w-full rounded-full bg-slate-700/60 overflow-hidden">
+                        <div className="mt-2 h-1 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{
-                              width: `${(respondidas / preguntasDelBloque.length) * 100}%`,
+                              width: `${(respondidas / ids.length) * 100}%`,
                               background: esActivo
-                                ? 'linear-gradient(90deg, #10b981, #06b6d4)'
-                                : '#475569',
+                                ? 'linear-gradient(90deg, #2563EB, #3B82F6)'
+                                : '#16A34A',
                             }}
                           />
                         </div>
@@ -223,54 +220,48 @@ export default function DiagnosticoWizard() {
                 </div>
               </div>
 
-              {/* ── COLUMNA DERECHA: Gauge + Info ── */}
+              {/* ── Columna derecha ── */}
               <div className="space-y-4 lg:sticky lg:top-24">
                 {/* Gauge Card */}
-                <div
-                  className="rounded-2xl bg-slate-800/60 backdrop-blur-md border border-slate-700/60 p-5 shadow-xl"
-                  style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}
-                >
+                <div className="rounded-2xl bg-white border border-[#E2E8F0] p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <p className="text-xs font-bold text-[#64748B] uppercase tracking-widest">
                       Score en Tiempo Real
                     </p>
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <div className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
                   </div>
                   <div className="flex justify-center">
-                    <GaugeChart
-                      score={estado.scoreActual}
-                      nivelRiesgo={estado.nivelRiesgo}
-                    />
+                    <GaugeChart score={estado.scoreActual} nivelRiesgo={estado.nivelRiesgo} />
                   </div>
                 </div>
 
-                {/* Info legal card */}
-                <div className="rounded-xl bg-slate-800/40 border border-slate-700/40 p-4">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                {/* Info legal */}
+                <div className="rounded-xl bg-white border border-[#E2E8F0] p-4">
+                  <p className="text-xs font-bold text-[#64748B] uppercase tracking-widest mb-3 flex items-center gap-1.5">
                     <span>⚖️</span> Marco Legal
                   </p>
-                  <div className="space-y-2 text-[11px] text-slate-500 leading-relaxed">
+                  <div className="space-y-2 text-[11px] text-[#64748B] leading-relaxed">
                     <p>
-                      <span className="text-slate-400 font-semibold">Ley 1581 de 2012</span> — Estatuto de
+                      <span className="text-[#0F172A] font-semibold">Ley 1581 de 2012</span> — Estatuto de
                       Protección de Datos Personales en Colombia.
                     </p>
                     <p>
-                      <span className="text-slate-400 font-semibold">Decreto 1074 de 2015</span> — Reglamentación
+                      <span className="text-[#0F172A] font-semibold">Decreto 1074 de 2015</span> — Reglamentación
                       del tratamiento de datos.
                     </p>
                     <p>
-                      <span className="text-slate-400 font-semibold">Autoridad:</span> Superintendencia de Industria
+                      <span className="text-[#0F172A] font-semibold">Autoridad:</span> Superintendencia de Industria
                       y Comercio (SIC).
                     </p>
                   </div>
                 </div>
 
-                {/* Consejos de respuesta */}
-                <div className="rounded-xl bg-slate-800/30 border border-slate-700/30 p-4">
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                {/* Tip Copilot */}
+                <div className="rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] p-4">
+                  <p className="text-[11px] text-[#64748B] leading-relaxed">
                     💡 Use el botón{' '}
-                    <span className="text-teal-400 font-semibold">Consultar Copilot IA</span> para
-                    entender qué exige exactamente la ley para cada pregunta en lenguaje empresarial.
+                    <span className="text-[#2563EB] font-semibold">Consultar Copilot IA</span> para
+                    entender exactamente qué exige la ley para cada pregunta.
                   </p>
                 </div>
               </div>
