@@ -57,7 +57,7 @@ export default function DashboardPage() {
         </div>
         <Link
           id="btn-nuevo-diagnostico"
-          href="/dashboard/diagnostico"
+          href="/diagnostico"
           className="btn-primary inline-flex items-center gap-2 px-5 py-3 text-sm no-underline"
         >
           <span className="text-base">📋</span>
@@ -108,7 +108,7 @@ export default function DashboardPage() {
               El proceso toma menos de 10 minutos.
             </p>
             <Link
-              href="/dashboard/diagnostico"
+              href="/diagnostico"
               className="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm no-underline"
             >
               🚀 Iniciar primer diagnóstico

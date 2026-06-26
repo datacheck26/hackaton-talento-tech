@@ -49,7 +49,7 @@ export default function OnboardingPage() {
       tamano: tamano as TamanoEmpresa,
       fechaRegistro: new Date().toISOString(),
     });
-    router.push('/dashboard/diagnostico');
+    router.push('/diagnostico');
   };
 
   const progreso = [nombre, nit, sector, tamano].filter(Boolean).length;

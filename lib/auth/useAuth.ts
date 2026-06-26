@@ -26,7 +26,7 @@ export function useAuth() {
 
   useEffect(() => {
     // Obtener sesión inicial
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: any) => {
       setAuthState({
         user: session?.user ?? null,
         session,
@@ -36,7 +36,7 @@ export function useAuth() {
     });
 
     // Escuchar cambios de auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setAuthState((prev) => ({
         ...prev,
         user: session?.user ?? null,

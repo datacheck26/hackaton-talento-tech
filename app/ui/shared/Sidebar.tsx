@@ -10,7 +10,7 @@ import { useEmpresa } from '../../../lib/empresa/useEmpresa';
 
 const NAV_ITEMS = [
   { href: '/dashboard',             icon: '🏠', label: 'Dashboard' },
-  { href: '/dashboard/diagnostico', icon: '📋', label: 'Nuevo Diagnóstico' },
+  { href: '/diagnostico',           icon: '📋', label: 'Nuevo Diagnóstico' },
   { href: '/onboarding',            icon: '🏢', label: 'Mi Empresa' },
 ];
 
