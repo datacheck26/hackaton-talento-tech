@@ -111,9 +111,9 @@ export default function OnboardingPage() {
           </div>
 
           {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Card formulario */}
-            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 space-y-5 shadow-sm">
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 space-y-4 shadow-sm">
 
               {/* Nombre */}
               <div className="space-y-1.5">
@@ -182,63 +182,49 @@ export default function OnboardingPage() {
                   <p className="text-xs text-[#EF4444]">Seleccione el sector de su empresa</p>
                 )}
               </div>
-            </div>
 
-            {/* Tamaño — fuera de la card, con radio buttons visuales */}
-            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
-              <p className="text-sm font-semibold text-[#0F172A] mb-4">
-                Tamaño de la empresa <span className="text-[#EF4444]">*</span>
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {TAMANOS.map(({ value, label, descripcion }) => (
-                  <label
-                    key={value}
-                    htmlFor={`tamano-${value}`}
-                    className={`flex flex-col gap-0.5 p-4 rounded-xl border-2 cursor-pointer transition-all duration-150 ${
-                      tamano === value
-                        ? 'border-[#2563EB] bg-[#EFF6FF]'
-                        : 'border-[#E2E8F0] bg-white hover:border-[#BFDBFE] hover:bg-[#F8FAFC]'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      id={`tamano-${value}`}
-                      name="tamano"
-                      value={value}
-                      checked={tamano === value}
-                      onChange={() => setTamano(value)}
-                      className="sr-only"
-                    />
-                    <span className={`text-sm font-bold ${tamano === value ? 'text-[#2563EB]' : 'text-[#0F172A]'}`}>
-                      {label}
-                    </span>
-                    <span className="text-xs text-[#64748B]">{descripcion}</span>
-                    {tamano === value && (
-                      <span className="mt-1 text-[10px] font-semibold text-[#2563EB]">✓ Seleccionado</span>
-                    )}
-                  </label>
-                ))}
+              {/* Tamaño */}
+              <div className="space-y-1.5">
+                <label htmlFor="empresa-tamano" className="block text-sm font-semibold text-[#0F172A]">
+                  Tamaño de la empresa <span className="text-[#EF4444]">*</span>
+                </label>
+                <select
+                  id="empresa-tamano"
+                  value={tamano}
+                  onChange={(e) => setTamano(e.target.value as TamanoEmpresa)}
+                  className={`input-base w-full px-4 py-3 text-sm ${
+                    tamano ? 'border-[#16A34A]' : ''
+                  }`}
+                >
+                  <option value="" disabled>Selecciona el tamaño</option>
+                  {TAMANOS.map(({ value, label, descripcion }) => (
+                    <option key={value} value={value}>{label} ({descripcion})</option>
+                  ))}
+                </select>
               </div>
-            </div>
 
-            {/* Botón */}
-            <button
-              id="btn-iniciar-diagnostico"
-              type="submit"
-              disabled={loading || progreso < 4}
-              className="btn-primary w-full py-4 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Guardando información...
-                </>
-              ) : (
-                <>
-                  Iniciar Diagnóstico →
-                </>
-              )}
-            </button>
+              {/* Botón */}
+              <div className="pt-2">
+                <button
+                  id="btn-iniciar-diagnostico"
+                  type="submit"
+                  disabled={loading || progreso < 4}
+                  className="btn-primary w-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Guardando información...
+                    </>
+                  ) : (
+                    <>
+                      Iniciar Diagnóstico →
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </div>
 
             <p className="text-center text-xs text-[#64748B]">
               🔒 Tu información se almacena de forma segura y no se comparte con terceros.

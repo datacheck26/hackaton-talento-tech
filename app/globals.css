@@ -231,22 +231,27 @@ body {
 }
 
 /* Input base */
-.input-base {
-  background: var(--color-bg-surface);
+.input-base, input.input-base, select.input-base, textarea.input-base {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  color: var(--color-text-primary);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.input-base:focus {
+.input-base:focus, input.input-base:focus, select.input-base:focus, textarea.input-base:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
 }
 
-.input-base::placeholder {
-  color: var(--color-text-muted);
+.input-base::placeholder, input.input-base::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+.input-base option {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
 /* Button primary */
