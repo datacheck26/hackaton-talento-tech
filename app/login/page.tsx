@@ -12,7 +12,7 @@ import LoginForm from '../ui/auth/LoginForm';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signInWithEmail, signInWithGoogle, loading, error } = useAuth();
+  const { signInWithEmail, signInWithGoogle, signInWithMicrosoft, loading, error } = useAuth();
 
   const handleLogin = async (email: string, password: string) => {
     const ok = await signInWithEmail(email, password);
@@ -22,6 +22,10 @@ export default function LoginPage() {
   const handleGoogle = async () => {
     await signInWithGoogle();
     // La redirección la maneja Supabase OAuth vía redirectTo
+  };
+
+  const handleMicrosoft = async () => {
+    await signInWithMicrosoft();
   };
 
   return (
@@ -131,6 +135,7 @@ export default function LoginPage() {
           <LoginForm
             onSubmit={handleLogin}
             onGoogle={handleGoogle}
+            onMicrosoft={handleMicrosoft}
             loading={loading}
             error={error}
           />

@@ -4,9 +4,11 @@
 // DiagnosticoWizard — Modo Claro (paleta CAVALTEC)
 // ============================================================
 
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDiagnostico } from '../../../lib/diagnostico/useDiagnostico';
 import { useEmpresa } from '../../../lib/empresa/useEmpresa';
+import { useAuth } from '../../../lib/auth/useAuth';
 import { BLOQUES } from '../../../lib/diagnostico/preguntas';
 import ProgressBar from './ProgressBar';
 import GaugeChart from './GaugeChart';
@@ -17,6 +19,8 @@ import ResultadoPanel from './ResultadoPanel';
 export default function DiagnosticoWizard() {
   const router = useRouter();
   const { guardarDiagnostico, empresa } = useEmpresa();
+  const { user } = useAuth();
+  const hasSavedRef = useRef(false);
   const {
     estado,
     preguntaActual,
@@ -33,11 +37,15 @@ export default function DiagnosticoWizard() {
     ? BLOQUES.find((b) => b.id === preguntaActual.bloqueId)
     : null;
 
-  // Guardar resultado en historial cuando se completa
-  const handleResultadoGuardado = (callback: () => void) => {
-    if (estado.resultado) {
+  // Guardar resultado en historial automáticamente cuando se completa
+  useEffect(() => {
+    if (estado.completado && estado.resultado && !hasSavedRef.current) {
+      hasSavedRef.current = true;
       guardarDiagnostico(estado.resultado);
     }
+  }, [estado.completado, estado.resultado, guardarDiagnostico]);
+
+  const handleResultadoGuardado = (callback: () => void) => {
     callback();
   };
 
@@ -122,11 +130,15 @@ export default function DiagnosticoWizard() {
           {estado.completado && estado.resultado ? (
             <ResultadoPanel
               resultado={estado.resultado}
-              onReiniciar={() => handleResultadoGuardado(reiniciar)}
+              onReiniciar={() => {
+                hasSavedRef.current = false;
+                reiniciar();
+              }}
               onVerDashboard={() => {
-                if (estado.resultado) guardarDiagnostico(estado.resultado);
                 router.push('/dashboard');
               }}
+              empresaNombre={empresa?.nombre}
+              emailEvaluador={user?.email}
             />
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 items-start">

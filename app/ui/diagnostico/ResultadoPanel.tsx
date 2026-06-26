@@ -6,11 +6,14 @@
 
 import type { ResultadoDiagnostico, NivelRiesgo } from '../../../lib/diagnostico/types';
 import GaugeChart from './GaugeChart';
+import PDFReportGenerator from '../shared/PDFReportGenerator';
 
 interface ResultadoPanelProps {
   resultado: ResultadoDiagnostico;
   onReiniciar: () => void;
   onVerDashboard?: () => void;
+  empresaNombre?: string;
+  emailEvaluador?: string;
 }
 
 const NIVEL_CONFIG: Record<NivelRiesgo, { label: string; description: string; color: string; bg: string; border: string; icon: string }> = {
@@ -46,7 +49,7 @@ const BLOQUE_ACCENT: Record<string, string> = {
   gobernanza:        '#F59E0B',
 };
 
-export default function ResultadoPanel({ resultado, onReiniciar, onVerDashboard }: ResultadoPanelProps) {
+export default function ResultadoPanel({ resultado, onReiniciar, onVerDashboard, empresaNombre = 'Mi Empresa', emailEvaluador = '' }: ResultadoPanelProps) {
   const config = NIVEL_CONFIG[resultado.nivelRiesgo];
   const fecha  = resultado.fechaCompletado.toLocaleDateString('es-CO', {
     day: 'numeric', month: 'long', year: 'numeric',
@@ -195,13 +198,18 @@ export default function ResultadoPanel({ resultado, onReiniciar, onVerDashboard 
             🏠 Ver Dashboard
           </button>
         )}
-        <button
-          id="btn-descargar"
-          onClick={() => window.print()}
-          className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-sm"
-        >
-          📄 Exportar Resultado
-        </button>
+      </div>
+
+      <div className="mt-8 pt-6 border-t border-[#E2E8F0] flex justify-center">
+        <PDFReportGenerator
+          empresaNombre={empresaNombre}
+          scoreTotal={resultado.scoreTotal}
+          nivelRiesgo={resultado.nivelRiesgo}
+          fecha={resultado.fechaCompletado.toISOString()}
+          resultadosPorBloque={resultado.resultadosPorBloque}
+          recomendaciones={resultado.recomendaciones}
+          emailEvaluador={emailEvaluador}
+        />
       </div>
     </div>
   );

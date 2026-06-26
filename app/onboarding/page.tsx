@@ -42,7 +42,7 @@ export default function OnboardingPage() {
     if (!nombreValido || !nitValido || !sectorValido || !tamanoValido) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 600)); // Simula guardado
-    guardarEmpresa({
+    await guardarEmpresa({
       nombre: nombre.trim(),
       nit,
       sector: sector as SectorEmpresa,

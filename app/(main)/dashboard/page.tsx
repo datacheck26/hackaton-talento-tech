@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useEmpresa } from '../../../lib/empresa/useEmpresa';
 import MetricCard from '../../ui/shared/MetricCard';
 import type { NivelRiesgo } from '../../../lib/diagnostico/types';
+import AIChatBot from '../../ui/shared/AIChatBot';
 
 const NIVEL_LABEL: Record<string, string> = {
   conforme:   'Conforme',
@@ -191,6 +192,17 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* ── Asistente IA ── */}
+      <div className="animate-fade-slide-up mt-8">
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-[#0F172A] uppercase tracking-wider">
+            Consultoría Inteligente
+          </h2>
+          <p className="text-xs text-[#64748B] mt-1">Resuelve tus dudas sobre privacidad y la Ley 1581 al instante.</p>
+        </div>
+        <AIChatBot />
+      </div>
 
       {/* ── Marco legal ── */}
       <div className="animate-fade-slide-up">

@@ -96,6 +96,23 @@ export function useAuth() {
   }, []);
 
   // ----------------------------------------------------------
+  // OAuth Microsoft (Azure)
+  // ----------------------------------------------------------
+  const signInWithMicrosoft = useCallback(async () => {
+    setAuthState((prev) => ({ ...prev, error: null }));
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'azure',
+      options: {
+        scopes: 'email',
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+    if (error) {
+      setAuthState((prev) => ({ ...prev, error: error.message }));
+    }
+  }, []);
+
+  // ----------------------------------------------------------
   // Sign Out
   // ----------------------------------------------------------
   const signOut = useCallback(async () => {
@@ -108,6 +125,7 @@ export function useAuth() {
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
+    signInWithMicrosoft,
     signOut,
   };
 }

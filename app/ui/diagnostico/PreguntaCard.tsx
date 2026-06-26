@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Pregunta, Bloque } from '../../../lib/diagnostico/types';
 import { useEmpresa } from '../../../lib/empresa/useEmpresa';
+import EvidenciaUploader from './EvidenciaUploader';
 
 interface PreguntaCardProps {
   pregunta: Pregunta;
@@ -213,6 +214,15 @@ export default function PreguntaCard({
               <span>No, aún no</span>
             </button>
           </div>
+
+          {/* Subir Evidencia (opcional) */}
+          <EvidenciaUploader 
+            preguntaId={pregunta.id} 
+            onUploadSuccess={(url) => {
+              console.log('Evidencia subida:', url);
+              // Podríamos inyectarlo al store global si fuese necesario
+            }} 
+          />
 
           {/* Copilot */}
           <div className="border-t border-[#E2E8F0] pt-4">

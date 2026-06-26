@@ -28,19 +28,7 @@ export default function Sidebar() {
       {/* ── Logo ── */}
       <div className="px-6 pt-7 pb-6 border-b border-white/10">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-base shadow-lg transition-transform group-hover:scale-105"
-            style={{ background: 'linear-gradient(135deg, #2563EB, #1E40AF)' }}
-          >
-            D
-          </div>
-          <div>
-            <span className="text-white text-sm font-black tracking-tight">Datacheck</span>
-            <span className="text-[#60A5FA] text-sm font-black tracking-tight"> AI</span>
-            <p className="text-[9px] text-white/40 font-mono tracking-widest uppercase leading-none mt-0.5">
-              Ley 1581 / 2012
-            </p>
-          </div>
+          <img src="/logo.png" alt="DataCheck AI Logo" className="h-10 w-auto object-contain" />
         </Link>
       </div>
 
