@@ -27,6 +27,32 @@ export default function AdminDashboardPage() {
     loadStats();
   }, []);
 
+  const handleDeleteEmpresa = async (id: string, nombre: string) => {
+    if (!window.confirm(`¿Estás seguro de eliminar permanentemente la empresa "${nombre}" y todos sus diagnósticos?`)) {
+      return;
+    }
+
+    try {
+      // Eliminamos registros relacionados primero por si no hay CASCADE en DB
+      await supabase.from('diagnosticos').delete().eq('empresa_id', id);
+      await supabase.from('user_empresas').delete().eq('empresa_id', id);
+      
+      // Eliminamos la empresa
+      const { error } = await supabase.from('empresas').delete().eq('id', id);
+      
+      if (error) {
+        alert('Error al eliminar la empresa: ' + error.message);
+        return;
+      }
+      
+      // Actualizamos la UI localmente
+      setEmpresas(prev => prev.filter(emp => emp.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Ocurrió un error inesperado al eliminar la empresa.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-8 max-w-6xl mx-auto flex justify-center items-center h-64">
@@ -176,6 +202,7 @@ export default function AdminDashboardPage() {
                   <th className="px-5 py-3">Diagnósticos</th>
                   <th className="px-5 py-3">Último Score</th>
                   <th className="px-5 py-3 text-right">Riesgo</th>
+                  <th className="px-5 py-3 text-center">Acción</th>
                 </tr>
               </thead>
               <tbody>
@@ -210,6 +237,15 @@ export default function AdminDashboardPage() {
                             {ultimoDiag.nivel_riesgo.toUpperCase()}
                           </span>
                         ) : '-'}
+                      </td>
+                      <td className="px-5 py-4 text-center">
+                        <button
+                          onClick={() => handleDeleteEmpresa(emp.id, emp.nombre)}
+                          className="p-1.5 text-[#EF4444] hover:bg-[#FEE2E2] rounded transition-colors tooltip-trigger"
+                          title="Eliminar empresa"
+                        >
+                          🗑️
+                        </button>
                       </td>
                     </tr>
                   );
