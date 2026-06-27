@@ -1,10 +1,19 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function AIChatBot() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat() as any;
+  const { messages, sendMessage, isLoading } = useChat() as any;
+  const [input, setInput] = useState('');
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    sendMessage({ role: 'user', content: input });
+    setInput('');
+  };
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
