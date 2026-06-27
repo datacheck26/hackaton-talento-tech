@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 export default function AIChatBot() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: '/api/chat',
-  });
+  }) as any;
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
