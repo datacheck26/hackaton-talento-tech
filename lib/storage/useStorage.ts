@@ -2,7 +2,6 @@ import { supabase } from '../supabaseClient';
 import { useState } from 'react';
 
 export function useStorage() {
-  const supabase = createClient();
   const [uploading, setUploading] = useState(false);
 
   const uploadFile = async (empresaId: string, preguntaId: string, file: File) => {

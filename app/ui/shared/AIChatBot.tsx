@@ -25,13 +25,13 @@ export default function AIChatBot() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F8FAFC]">
-        {messages.length === 0 && (
+        {(!messages || messages.length === 0) && (
           <div className="text-center text-[#64748B] text-sm mt-10">
             ¡Hola! Pregúntame sobre los derechos ARCO, plazos de respuesta o manejo de datos sensibles.
           </div>
         )}
         
-        {messages.map(m => (
+        {messages?.map((m: any) => (
           <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-xl p-3 text-sm ${
               m.role === 'user' 
@@ -58,14 +58,14 @@ export default function AIChatBot() {
       <form onSubmit={handleSubmit} className="p-3 bg-white border-t border-[#E2E8F0] flex gap-2">
         <input
           className="flex-1 input-base px-3 py-2 text-sm"
-          value={input}
+          value={input || ''}
           onChange={handleInputChange}
           placeholder="Escribe tu consulta legal..."
           disabled={isLoading}
         />
         <button 
           type="submit" 
-          disabled={isLoading || !input.trim()}
+          disabled={isLoading || !input?.trim()}
           className="btn-primary px-4 py-2 text-sm flex items-center justify-center disabled:opacity-50"
         >
           Enviar
