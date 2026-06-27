@@ -81,7 +81,7 @@ export default function PDFReportGenerator({
       if (res.success) {
         setStatusMsg('¡Correo enviado exitosamente!');
       } else {
-        setStatusMsg(res.error?.message || 'Error enviando el correo.');
+        setStatusMsg((res.error as any)?.message || 'Error enviando el correo.');
       }
     } catch (err) {
       console.error(err);
