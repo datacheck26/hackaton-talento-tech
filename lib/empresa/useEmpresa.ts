@@ -24,12 +24,16 @@ export function useEmpresa() {
   const [empresa, setEmpresaState] = useState<DatosEmpresa | null>(null);
   const [historial, setHistorialState] = useState<DiagnosticoGuardado[]>([]);
   const [empresaId, setEmpresaId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Leer desde Supabase al montar
   useEffect(() => {
     async function loadData() {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        setLoading(false);
+        return;
+      }
 
       // Cargar empresa (la primera que tenga asignada)
       const { data: ueData } = await supabase
@@ -75,6 +79,7 @@ export function useEmpresa() {
           }
         }
       }
+      setLoading(false);
     }
     loadData();
   }, []);
@@ -150,7 +155,8 @@ export function useEmpresa() {
   return {
     empresa,
     historial,
-    empresaId, // Exportado para uso en otros hooks
+    empresaId,
+    loading,
     guardarEmpresa,
     limpiarEmpresa,
     guardarDiagnostico,

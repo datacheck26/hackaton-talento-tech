@@ -1,6 +1,15 @@
+'use client';
+
+import Link from 'next/link';
+
 export default function PoliticasPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-[#0F172A]">
+      <div className="mb-6">
+        <Link href="/" onClick={(e) => { e.preventDefault(); window.history.back(); }} className="text-[#2563EB] hover:underline flex items-center gap-2 text-sm font-semibold">
+          <span>←</span> Volver atrás
+        </Link>
+      </div>
       <h1 className="text-3xl font-black mb-8">Políticas y Privacidad de DataCheck AI</h1>
 
       <section className="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-[#E2E8F0]">

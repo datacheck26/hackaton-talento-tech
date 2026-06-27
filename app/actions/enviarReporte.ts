@@ -9,6 +9,10 @@ export async function enviarReporteEmail(
   nombreEmpresa: string,
   emailEvaluador: string
 ) {
+  if (!process.env.RESEND_API_KEY) {
+    return { success: false, error: { message: 'La función de envío por correo no está configurada (Falta RESEND_API_KEY).' } };
+  }
+  
   try {
     const { data, error } = await resend.emails.send({
       from: 'Datacheck AI <onboarding@resend.dev>', // Usando el dominio de prueba de Resend

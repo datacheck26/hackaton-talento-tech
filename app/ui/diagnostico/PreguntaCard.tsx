@@ -4,10 +4,9 @@
 // PreguntaCard — Modo Claro (paleta CAVALTEC) con Copilot Integrado
 // ============================================================
 
-import { useState, useEffect, useRef } from 'react';
+
 import type { Pregunta, Bloque } from '../../../lib/diagnostico/types';
 import { useEmpresa } from '../../../lib/empresa/useEmpresa';
-import EvidenciaUploader from './EvidenciaUploader';
 
 interface PreguntaCardProps {
   pregunta: Pregunta;
@@ -43,14 +42,7 @@ const BLOQUE_CONFIG: Record<string, { topBar: string; numGradient: string; badge
   },
 };
 
-function renderMarkdown(text: string) {
-  const formatted = text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^\* (.*?)$/gm, '• $1')
-    .split('\n')
-    .join('<br />');
-  return <div dangerouslySetInnerHTML={{ __html: formatted }} />;
-}
+
 
 export default function PreguntaCard({
   pregunta,
@@ -63,74 +55,6 @@ export default function PreguntaCard({
 }: PreguntaCardProps) {
   const cfg = BLOQUE_CONFIG[bloque.id] ?? BLOQUE_CONFIG.politica;
   const { empresa } = useEmpresa();
-
-  const [copilotAbierto, setCopilotAbierto] = useState(false);
-  const [messages, setMessages] = useState<Array<{ sender: 'user' | 'assistant'; text: string }>>([]);
-  const [inputVal, setInputVal] = useState('');
-  const [enviando, setEnviando] = useState(false);
-
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    if (messages.length > 0 || enviando) {
-      scrollToBottom();
-    }
-  }, [messages, enviando]);
-
-  // Reset when question changes
-  useEffect(() => {
-    setCopilotAbierto(false);
-    setMessages([]);
-    setInputVal('');
-    setEnviando(false);
-  }, [pregunta.id]);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputVal.trim() || enviando) return;
-
-    const userMsg = inputVal.trim();
-    setInputVal('');
-    setMessages((prev) => [...prev, { sender: 'user', text: userMsg }]);
-    setEnviando(true);
-
-    try {
-      const res = await fetch('/api/copilot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pregunta: {
-            id: pregunta.id,
-            texto: pregunta.texto,
-            articuloLegal: pregunta.articuloLegal,
-            textoLegal: pregunta.textoLegal,
-          },
-          mensajeUsuario: userMsg,
-          empresa: empresa ? {
-            nombre: empresa.nombre,
-            sector: empresa.sector,
-            tamano: empresa.tamano
-          } : null,
-        }),
-      });
-
-      if (!res.ok) throw new Error();
-
-      const data = await res.json();
-      setMessages((prev) => [...prev, { sender: 'assistant', text: data.respuesta }]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'assistant', text: '❌ Error al conectar con Copilot. Inténtalo de nuevo.' }
-      ]);
-    } finally {
-      setEnviando(false);
-    }
-  };
 
   return (
     <div className="animate-fade-slide-up w-full max-w-2xl mx-auto">
@@ -215,137 +139,6 @@ export default function PreguntaCard({
             </button>
           </div>
 
-          {/* Subir Evidencia (opcional) */}
-          <EvidenciaUploader 
-            preguntaId={pregunta.id} 
-            onUploadSuccess={(url) => {
-              console.log('Evidencia subida:', url);
-              // Podríamos inyectarlo al store global si fuese necesario
-            }} 
-          />
-
-          {/* Copilot */}
-          <div className="border-t border-[#E2E8F0] pt-4">
-            <button
-              id={`btn-copilot-${pregunta.id}`}
-              onClick={() => {
-                setCopilotAbierto((prev) => !prev);
-                if (onConsultarCopilot) onConsultarCopilot(pregunta);
-              }}
-              className={`group w-full flex items-center justify-center gap-2.5 rounded-xl px-5 py-3.5 font-semibold text-sm transition-all duration-200 ${
-                copilotAbierto
-                  ? 'bg-[#2563EB] text-white border border-[#2563EB]'
-                  : 'bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB]'
-              } hover:scale-[1.01] active:scale-[0.99]`}
-            >
-              <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-base border transition-all ${
-                copilotAbierto
-                  ? 'bg-white/20 border-white/30 text-white'
-                  : 'bg-[#BFDBFE] border-[#93C5FD] text-[#2563EB] group-hover:bg-white/20 group-hover:border-white/30 group-hover:text-white'
-              }`}>
-                🤖
-              </span>
-              <span>{copilotAbierto ? 'Ocultar Copilot IA' : 'Consultar Copilot IA'}</span>
-              <span className={`ml-auto text-xs ${
-                copilotAbierto ? 'text-white/70' : 'text-[#64748B] group-hover:text-white/70'
-              }`}>
-                {copilotAbierto ? 'Cerrar chat' : '¿Qué exige la ley?'}
-              </span>
-            </button>
-
-            {/* Collapsible Copilot box */}
-            {copilotAbierto && (
-              <div className="mt-4 pt-4 border-t border-[#E2E8F0] space-y-4 animate-scale-in">
-                {/* Consejo rápido consolidado */}
-                <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-4 text-xs space-y-2 text-[#0F172A]">
-                  <div className="flex items-start gap-2">
-                    <span className="text-sm flex-shrink-0">💡</span>
-                    <p className="leading-relaxed">
-                      <strong className="text-[#2563EB]">Consejo:</strong>{' '}
-                      {pregunta.consejoCopilot.replace(/\*\*(.*?)\*\*/g, '$1')}
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2 border-t border-[#BFDBFE]/60 pt-2">
-                    <span className="text-sm flex-shrink-0">🏢</span>
-                    <p className="leading-relaxed">
-                      <strong className="text-[#2563EB]">Ejemplo:</strong>{' '}
-                      {pregunta.ejemploPractico}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Chatbox area */}
-                <div className="space-y-3.5">
-                  <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
-                    💬 Chat rápido con Copilot IA
-                  </p>
-
-                  <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                    {messages.length === 0 ? (
-                      <p className="text-xs text-[#64748B] bg-white border border-[#E2E8F0] rounded-xl p-3.5 text-center shadow-sm italic">
-                        Pregúntame cualquier duda de cumplimiento técnico o legal sobre este requisito y te responderé de forma ultra directa.
-                      </p>
-                    ) : (
-                      messages.map((msg, idx) => (
-                        <div
-                          key={idx}
-                          className={`flex gap-2 max-w-[90%] ${
-                            msg.sender === 'user' ? 'ml-auto flex-row-reverse' : ''
-                          }`}
-                        >
-                          <div
-                            className={`rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${
-                              msg.sender === 'user'
-                                ? 'bg-[#2563EB] text-white rounded-tr-none'
-                                : 'bg-[#F1F5F9] text-[#0F172A] rounded-tl-none border border-[#E2E8F0] shadow-sm'
-                            }`}
-                          >
-                            {msg.sender === 'assistant' ? (
-                              renderMarkdown(msg.text)
-                            ) : (
-                              <p>{msg.text}</p>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                    )}
-
-                    {enviando && (
-                      <div className="flex gap-2">
-                        <div className="bg-[#F1F5F9] border border-[#E2E8F0] rounded-2xl rounded-tl-none px-3 py-2 text-xs flex items-center gap-1.5 shadow-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#64748B] animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#64748B] animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#64748B] animate-bounce" style={{ animationDelay: '300ms' }} />
-                        </div>
-                      </div>
-                    )}
-
-                    <div ref={messagesEndRef} />
-                  </div>
-
-                  {/* Formulario */}
-                  <form onSubmit={handleSendMessage} className="flex gap-2" noValidate>
-                    <input
-                      type="text"
-                      value={inputVal}
-                      onChange={(e) => setInputVal(e.target.value)}
-                      placeholder="Escribe tu duda sobre esta regla..."
-                      className="input-base flex-1 px-3.5 py-2.5 text-xs text-[#0F172A] border-[#E2E8F0]"
-                      disabled={enviando}
-                    />
-                    <button
-                      type="submit"
-                      disabled={!inputVal.trim() || enviando}
-                      className="btn-primary px-4 py-2.5 text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <span>Preguntar</span>
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )}
-
-          </div>
         </div>
       </div>
 

@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { useEmpresa } from '../../../lib/empresa/useEmpresa';
 import MetricCard from '../../ui/shared/MetricCard';
 import type { NivelRiesgo } from '../../../lib/diagnostico/types';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import AIChatBot from '../../ui/shared/AIChatBot';
 
 const NIVEL_LABEL: Record<string, string> = {
@@ -29,7 +31,18 @@ function formatFecha(iso: string) {
 }
 
 export default function DashboardPage() {
-  const { empresa, historial } = useEmpresa();
+  const { empresa, historial, loading } = useEmpresa();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !empresa) {
+      router.push('/onboarding');
+    }
+  }, [loading, empresa, router]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-full">Cargando...</div>;
+  }
 
   const ultimoDiagnostico = historial[0] ?? null;
   const totalDiagnosticos = historial.length;

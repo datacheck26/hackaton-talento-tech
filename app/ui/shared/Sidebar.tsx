@@ -28,7 +28,9 @@ export default function Sidebar() {
       {/* ── Logo ── */}
       <div className="px-6 pt-7 pb-6 border-b border-white/10">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <img src="/logo.png" alt="DataCheck AI Logo" className="h-10 w-auto object-contain" />
+          <span className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+            🛡️ DataCheck<span className="text-[#60A5FA]">AI</span>
+          </span>
         </Link>
       </div>
 
