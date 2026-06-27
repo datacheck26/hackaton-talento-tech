@@ -96,9 +96,9 @@ export function useEmpresa() {
     loadData();
   }, []);
 
-  const guardarEmpresa = useCallback(async (datos: DatosEmpresa) => {
+  const guardarEmpresa = useCallback(async (datos: DatosEmpresa): Promise<boolean> => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) return false;
 
     // Crear la empresa (el trigger de DB asignará al usuario en user_empresas)
     const { data, error } = await supabase
@@ -127,6 +127,10 @@ export function useEmpresa() {
 
       setEmpresaId(data.id);
       setEmpresaState(datos);
+      return true;
+    } else {
+      console.error("Error al guardar empresa:", error);
+      return false;
     }
   }, []);
 

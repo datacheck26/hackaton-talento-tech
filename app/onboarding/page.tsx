@@ -26,6 +26,7 @@ export default function OnboardingPage() {
   const [tamano,  setTamano]  = useState<TamanoEmpresa | ''>('');
   const [touched, setTouched] = useState({ nombre: false, nit: false, sector: false });
   const [loading, setLoading] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const nitLimpio    = nit.replace(/\D/g, '');
   const nombreValido = nombre.trim().length >= 2;
@@ -45,17 +46,24 @@ export default function OnboardingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ nombre: true, nit: true, sector: true });
+    setSaveError(null);
     if (!nombreValido || !nitValido || !sectorValido || !tamanoValido) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 600)); // Simula guardado
-    await guardarEmpresa({
+    const ok = await guardarEmpresa({
       nombre: nombre.trim(),
       nit,
       sector: sector as SectorEmpresa,
       tamano: tamano as TamanoEmpresa,
       fechaRegistro: new Date().toISOString(),
     });
-    router.push('/diagnostico');
+    
+    if (ok) {
+      router.push('/diagnostico');
+    } else {
+      setLoading(false);
+      setSaveError("La base de datos bloqueó el guardado. ¡No olvides correr el script SQL de permisos (RLS) en Supabase!");
+    }
   };
 
   const progreso = [nombre, nit, sector, tamano].filter(Boolean).length;
@@ -118,6 +126,14 @@ export default function OnboardingPage() {
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            
+            {/* Mensaje de error de Base de Datos */}
+            {saveError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm font-medium animate-scale-in">
+                ⚠️ {saveError}
+              </div>
+            )}
+
             {/* Card formulario */}
             <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 space-y-4 shadow-sm">
 
