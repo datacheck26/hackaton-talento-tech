@@ -107,7 +107,6 @@ export function useEmpresa() {
         .insert({
           user_id: session.user.id,
           empresa_id: data.id,
-          rol: 'admin' // Probando con 'admin' por si 'admin_empresa' es inválido
         });
       
       if (insertError) {
