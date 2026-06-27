@@ -16,7 +16,7 @@ export async function enviarReporteEmail(
   try {
     const { data, error } = await resend.emails.send({
       from: 'Datacheck AI <onboarding@resend.dev>', // Usando el dominio de prueba de Resend
-      to: ['datacheck26@gmail.com', emailEvaluador], // Envía al admin (datacheck26) y al evaluador
+      to: ['datacheck26@gmail.com'], // En la capa gratuita de Resend, SOLO se puede enviar al correo verificado (admin)
       subject: `Nuevo Reporte de Diagnóstico Ley 1581 - ${nombreEmpresa}`,
       html: `
         <h2>Diagnóstico Completado: ${nombreEmpresa}</h2>
