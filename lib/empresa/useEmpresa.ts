@@ -101,6 +101,19 @@ export function useEmpresa() {
       .single();
 
     if (!error && data) {
+      // Intentamos vincular manualmente por si el trigger de DB no existe
+      const { error: insertError } = await supabase
+        .from('user_empresas')
+        .insert({
+          user_id: session.user.id,
+          empresa_id: data.id,
+          rol: 'admin' // Probando con 'admin' por si 'admin_empresa' es inválido
+        });
+      
+      if (insertError) {
+        console.error("Error al vincular usuario con empresa:", insertError);
+      }
+
       setEmpresaId(data.id);
       setEmpresaState(datos);
     }
