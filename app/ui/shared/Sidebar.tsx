@@ -12,6 +12,8 @@ const NAV_ITEMS = [
   { href: '/dashboard',             icon: '🏠', label: 'Dashboard' },
   { href: '/diagnostico',           icon: '📋', label: 'Nuevo Diagnóstico' },
   { href: '/onboarding',            icon: '🏢', label: 'Mi Empresa' },
+  { href: '/auditor',               icon: '🔎', label: 'Auditoría' },
+  { href: '/admin',                 icon: '⚙️', label: 'Admin (Dev)' },
 ];
 
 export default function Sidebar() {

@@ -10,21 +10,20 @@ interface MetricCardProps {
   subtitulo?: string;
   icono: string;
   nivelRiesgo?: NivelRiesgo | null;
-  variante?: 'default' | 'conforme' | 'proceso' | 'critico';
+  variante?: 'default' | 'excelente' | 'aceptable' | 'riesgo_medio' | 'riesgo_alto';
 }
 
 const VARIANTE_STYLES = {
-  default:   { bg: '#FFFFFF', border: '#E2E8F0', iconBg: '#EFF6FF',     iconColor: '#2563EB', textColor: '#0F172A' },
-  conforme:  { bg: '#DCFCE7', border: '#BBF7D0', iconBg: '#16A34A20',  iconColor: '#16A34A', textColor: '#166534' },
-  proceso:   { bg: '#FEF3C7', border: '#FDE68A', iconBg: '#F59E0B20',  iconColor: '#F59E0B', textColor: '#92400E' },
-  critico:   { bg: '#FEE2E2', border: '#FECACA', iconBg: '#EF444420',  iconColor: '#EF4444', textColor: '#991B1B' },
+  default:      { bg: '#FFFFFF', border: '#E2E8F0', iconBg: '#EFF6FF',     iconColor: '#2563EB', textColor: '#0F172A' },
+  excelente:    { bg: '#DCFCE7', border: '#BBF7D0', iconBg: '#16A34A20',  iconColor: '#16A34A', textColor: '#166534' },
+  aceptable:    { bg: '#D1FAE5', border: '#A7F3D0', iconBg: '#05966920',  iconColor: '#059669', textColor: '#065F46' },
+  riesgo_medio: { bg: '#FEF3C7', border: '#FDE68A', iconBg: '#F59E0B20',  iconColor: '#F59E0B', textColor: '#92400E' },
+  riesgo_alto:  { bg: '#FEE2E2', border: '#FECACA', iconBg: '#EF444420',  iconColor: '#EF4444', textColor: '#991B1B' },
 };
 
 function nivelToVariante(nivel: NivelRiesgo | null | undefined): MetricCardProps['variante'] {
   if (!nivel) return 'default';
-  if (nivel === 'conforme')  return 'conforme';
-  if (nivel === 'en_proceso') return 'proceso';
-  return 'critico';
+  return nivel; // the NivelRiesgo enum values match the variante values directly now
 }
 
 export default function MetricCard({ titulo, valor, subtitulo, icono, nivelRiesgo, variante }: MetricCardProps) {

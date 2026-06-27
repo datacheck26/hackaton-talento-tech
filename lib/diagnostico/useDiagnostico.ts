@@ -21,9 +21,10 @@ import type {
 // Utilidad: calcular nivel de riesgo según score
 // ----------------------------------------------------------
 function calcularNivelRiesgo(score: number): NivelRiesgo {
-  if (score < 40) return 'critico';
-  if (score < 70) return 'en_proceso';
-  return 'conforme';
+  if (score < 50) return 'riesgo_alto';
+  if (score < 70) return 'riesgo_medio';
+  if (score < 90) return 'aceptable';
+  return 'excelente';
 }
 
 // ----------------------------------------------------------
@@ -80,7 +81,7 @@ const ESTADO_INICIAL: EstadoDiagnostico = {
   preguntaActualIndex: 0,
   respuestas: {},
   scoreActual: 0,
-  nivelRiesgo: 'critico',
+  nivelRiesgo: 'riesgo_alto',
   mostrandoSkipNotice: false,
   copilotAbierto: false,
   preguntaCopilot: null,

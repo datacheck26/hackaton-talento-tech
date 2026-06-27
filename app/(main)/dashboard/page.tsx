@@ -13,15 +13,17 @@ import { useRouter } from 'next/navigation';
 import AIChatBot from '../../ui/shared/AIChatBot';
 
 const NIVEL_LABEL: Record<string, string> = {
-  conforme:   'Conforme',
-  en_proceso: 'En Proceso',
-  critico:    'Crítico',
+  excelente:    'Excelente',
+  aceptable:    'Aceptable',
+  riesgo_medio: 'Riesgo Medio',
+  riesgo_alto:  'Riesgo Alto',
 };
 
 const NIVEL_STYLE: Record<string, { bg: string; color: string; border: string }> = {
-  conforme:   { bg: '#DCFCE7', color: '#16A34A', border: '#BBF7D0' },
-  en_proceso: { bg: '#FEF3C7', color: '#F59E0B', border: '#FDE68A' },
-  critico:    { bg: '#FEE2E2', color: '#EF4444', border: '#FECACA' },
+  excelente:    { bg: '#DCFCE7', color: '#16A34A', border: '#BBF7D0' }, // Verde oscuro
+  aceptable:    { bg: '#D1FAE5', color: '#059669', border: '#A7F3D0' }, // Verde claro/teal
+  riesgo_medio: { bg: '#FEF3C7', color: '#F59E0B', border: '#FDE68A' }, // Amarillo
+  riesgo_alto:  { bg: '#FEE2E2', color: '#EF4444', border: '#FECACA' }, // Rojo
 };
 
 function formatFecha(iso: string) {
@@ -46,7 +48,7 @@ export default function DashboardPage() {
 
   const ultimoDiagnostico = historial[0] ?? null;
   const totalDiagnosticos = historial.length;
-  const brechasCriticas   = historial.filter((d) => d.nivelRiesgo === 'critico').length;
+  const brechasCriticas   = historial.filter((d) => d.nivelRiesgo === 'riesgo_alto' || d.nivelRiesgo === 'riesgo_medio').length;
   const promedioScore     = historial.length > 0
     ? Math.round(historial.reduce((a, d) => a + d.scoreTotal, 0) / historial.length)
     : null;
@@ -105,7 +107,7 @@ export default function DashboardPage() {
           valor={brechasCriticas}
           subtitulo="Evaluaciones con riesgo alto"
           icono="🚨"
-          variante={brechasCriticas > 0 ? 'critico' : 'conforme'}
+          variante={brechasCriticas > 0 ? 'riesgo_alto' : 'excelente'}
         />
       </div>
 
@@ -152,7 +154,7 @@ export default function DashboardPage() {
 
             {/* Filas */}
             {historial.map((diag, i) => {
-              const style = NIVEL_STYLE[diag.nivelRiesgo] ?? NIVEL_STYLE.critico;
+              const style = NIVEL_STYLE[diag.nivelRiesgo] ?? NIVEL_STYLE.riesgo_alto;
               const brechas = diag.recomendaciones.filter((r) =>
                 !r.startsWith('✅')
               ).length;

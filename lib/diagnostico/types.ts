@@ -4,7 +4,7 @@
 
 export type RespuestaValor = 'si' | 'no' | null;
 
-export type NivelRiesgo = 'critico' | 'en_proceso' | 'conforme';
+export type NivelRiesgo = 'excelente' | 'aceptable' | 'riesgo_medio' | 'riesgo_alto';
 
 export type BloqueId = 'politica' | 'privacidad_disenio' | 'gobernanza';
 

@@ -14,24 +14,31 @@ interface GaugeChartProps {
 }
 
 const NIVEL_CONFIG: Record<NivelRiesgo, { color: string; label: string; emoji: string; glow: string; badgeBg: string }> = {
-  critico: {
+  riesgo_alto: {
     color: '#EF4444',
-    label: 'Incumplimiento Crítico',
+    label: 'Riesgo Alto',
     emoji: '🔴',
     glow: 'rgba(239,68,68,0.25)',
     badgeBg: '#FEE2E2',
   },
-  en_proceso: {
+  riesgo_medio: {
     color: '#F59E0B',
-    label: 'En Proceso',
+    label: 'Riesgo Medio',
     emoji: '🟡',
     glow: 'rgba(245,158,11,0.25)',
     badgeBg: '#FEF3C7',
   },
-  conforme: {
-    color: '#16A34A',
-    label: 'Conforme',
+  aceptable: {
+    color: '#059669',
+    label: 'Aceptable',
     emoji: '🟢',
+    glow: 'rgba(5,150,105,0.25)',
+    badgeBg: '#D1FAE5',
+  },
+  excelente: {
+    color: '#16A34A',
+    label: 'Excelente',
+    emoji: '🌟',
     glow: 'rgba(22,163,74,0.25)',
     badgeBg: '#DCFCE7',
   },
@@ -100,8 +107,9 @@ export default function GaugeChart({ score, nivelRiesgo, animated = true }: Gaug
             </filter>
             <linearGradient id="gauge-track-grad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
-              <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#10b981" stopOpacity="0.4" />
+              <stop offset="33%" stopColor="#f59e0b" stopOpacity="0.4" />
+              <stop offset="66%" stopColor="#059669" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#16a34a" stopOpacity="0.4" />
             </linearGradient>
           </defs>
 
