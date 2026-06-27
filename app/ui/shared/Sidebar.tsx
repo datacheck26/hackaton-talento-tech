@@ -9,16 +9,20 @@ import { usePathname } from 'next/navigation';
 import { useEmpresa } from '../../../lib/empresa/useEmpresa';
 
 const NAV_ITEMS = [
-  { href: '/dashboard',             icon: '🏠', label: 'Dashboard' },
+  { href: '/dashboard',             icon: '📈', label: 'Dashboard' },
   { href: '/diagnostico',           icon: '📋', label: 'Nuevo Diagnóstico' },
-  { href: '/onboarding',            icon: '🏢', label: 'Mi Empresa' },
-  { href: '/auditor',               icon: '🔎', label: 'Auditoría' },
+];
+
+const ADMIN_ITEMS = [
+  { href: '/auditor',               icon: '🔍', label: 'Auditoría' },
   { href: '/admin',                 icon: '⚙️', label: 'Admin (Dev)' },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { empresa } = useEmpresa();
+  const { empresa, role } = useEmpresa();
+
+  const isSpecialRole = role === 'auditor' || role === 'super_admin';
 
   return (
     <aside
@@ -70,6 +74,35 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        {isSpecialRole && (
+          <>
+            <p className="px-3 mb-3 mt-4 text-[10px] font-mono text-[#F59E0B] uppercase tracking-widest">
+              Administración
+            </p>
+            {ADMIN_ITEMS.map(({ href, icon, label }) => {
+              if (href === '/admin' && role !== 'super_admin') return null; // Solo super_admin ve /admin
+              const isActive = pathname === href || pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
+                    isActive
+                      ? 'bg-[#F59E0B]/20 text-[#FCD34D] shadow-sm'
+                      : 'text-white/60 hover:bg-white/8 hover:text-white'
+                  }`}
+                >
+                  <span className="text-base w-5 text-center">{icon}</span>
+                  <span>{label}</span>
+                  {isActive && (
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+                  )}
+                </Link>
+              );
+            })}
+          </>
+        )}
 
         <div className="pt-4 border-t border-white/10 mt-4 space-y-1">
           <p className="px-3 mb-3 text-[10px] font-mono text-white/30 uppercase tracking-widest">

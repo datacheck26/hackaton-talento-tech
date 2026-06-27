@@ -24,6 +24,7 @@ export function useEmpresa() {
   const [empresa, setEmpresaState] = useState<DatosEmpresa | null>(null);
   const [historial, setHistorialState] = useState<DiagnosticoGuardado[]>([]);
   const [empresaId, setEmpresaId] = useState<string | null>(null);
+  const [role, setRole] = useState<string>('admin_empresa');
   const [loading, setLoading] = useState(true);
 
   // Leer desde Supabase al montar
@@ -33,6 +34,17 @@ export function useEmpresa() {
       if (!session) {
         setLoading(false);
         return;
+      }
+
+      // Cargar rol del usuario
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .single();
+      
+      if (roleData) {
+        setRole(roleData.role);
       }
 
       // Cargar empresa (la primera que tenga asignada)
@@ -168,6 +180,7 @@ export function useEmpresa() {
     empresa,
     historial,
     empresaId,
+    role,
     loading,
     guardarEmpresa,
     limpiarEmpresa,

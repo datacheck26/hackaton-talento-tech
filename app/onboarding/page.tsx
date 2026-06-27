@@ -4,7 +4,7 @@
 // /onboarding — Captura de datos de empresa antes del diagnóstico
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEmpresa } from '../../lib/empresa/useEmpresa';
 import { SECTORES, TAMANOS } from '../../lib/empresa/types';
@@ -12,7 +12,13 @@ import type { SectorEmpresa, TamanoEmpresa } from '../../lib/empresa/types';
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { guardarEmpresa } = useEmpresa();
+  const { empresa, loading: empresaLoading, guardarEmpresa } = useEmpresa();
+
+  useEffect(() => {
+    if (!empresaLoading && empresa) {
+      router.push('/dashboard');
+    }
+  }, [empresa, empresaLoading, router]);
 
   const [nombre,  setNombre]  = useState('');
   const [nit,     setNit]     = useState('');
